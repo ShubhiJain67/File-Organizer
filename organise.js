@@ -133,6 +133,40 @@ function printError(message) {
 
 //--------------------------------------------- Functions -------------------------------------------
 
+function organise(result){
+	organiserSettings.forEach((setting) => {
+		setting.settings.files.forEach((file) => {
+			oldPath = result.folderPath + path.sep + file;
+			newPath = result.folderPath;
+			if (setting.settings.basePath != ""){
+				setting.settings.basePath.split('\\').forEach((folder)=>{
+					newPath += path.sep + folder
+					if(!fs.existsSync(newPath)){
+						print(`Creating new folder : ${folder}`);
+						fs.mkdirSync(newPath)
+					}
+				});
+			}
+			if (setting.name != ""){
+				newPath += path.sep + setting.name
+				if(!fs.existsSync(newPath)){
+					print(`Creating new folder : ${setting.settings.basePath + path.sep + setting.name}`);
+					fs.mkdirSync(newPath)
+				}
+			}
+			newPath += path.sep + file;
+			fs.copyFileSync(oldPath, newPath);
+			if (fs.existsSync(newPath)) {
+				fs.unlinkSync(oldPath);
+				print("File Moved successfully." + file);
+			  } 
+			else{
+				print(`Copied file doesn't exists. please check manually`);
+			}
+		});
+	});
+}
+
 function segregateAllFiles(files = []) {
 	files.forEach((file) => {
 		let fileArgs = file.split('.');
@@ -155,7 +189,6 @@ function getFiles(dirPath) {
 	try {
 		if (fs.existsSync(dirPath)) {
 			const files = fs.readdirSync(dirPath);
-			print(files);
 			segregateAllFiles(files);
 		}
 	} catch (err) {
@@ -169,52 +202,20 @@ const prompt = require('prompt');
 const path = require('path');
 const fs = require('fs');
 
-print(
-	'------------------------------Welcome to File Organizer----------------------------\n'
-);
+print('\n------------------------------Welcome to File Organizer----------------------------\n');
 print('Please enter the folder path you want to organize');
-prompt.start();
 
+prompt.start();
 prompt.get(prompt_attributes, function (err, result) {
 	if (err) {
 		printError(err);
 		return 1;
 	} else {
+		print('\n----------------------------- Operation Started -------------------------------\n');
 		getFiles(result.folderPath);
-		organiserSettings.forEach((setting) => {
-			print(setting.name + " : " + setting.settings.files)
-		});
-		organiserSettings.forEach((setting) => {
-			setting.settings.files.forEach((file) => {
-				oldPath = result.folderPath + path.sep + file;
-				newPath = result.folderPath;
-				if (setting.settings.basePath != ""){
-					setting.settings.basePath.split('\\').forEach((folder)=>{
-						newPath += path.sep + folder
-						if(!fs.existsSync(newPath)){
-							print(`Creating new folder : ${folder}`);
-							fs.mkdirSync(newPath)
-						}
-					});
-				}
-				if (setting.name != ""){
-					newPath += path.sep + setting.name
-					if(!fs.existsSync(newPath)){
-						print(`Creating new folder : ${setting.settings.basePath + path.sep + setting.name}`);
-						fs.mkdirSync(newPath)
-					}
-				}
-				newPath += path.sep + file;
-				fs.copyFileSync(oldPath, newPath);
-				if (fs.existsSync(newPath)) {
-					fs.unlinkSync(oldPath);
-					print("File Moved successfully." + file);
-				  } 
-				else{
-					print(`Copied file doesn't exists. please check manually`);
-				}
-			});
-		});
+		organise(result);
+		print('\n------------------------------ Operation Completed -----------------------------\n');
 	}
 });
 
+//C:\Users\ShubhiJ\Desktop\Practice\Pep\Javascript\File-Organizer\org
