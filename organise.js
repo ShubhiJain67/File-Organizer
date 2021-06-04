@@ -212,6 +212,7 @@ prompt.get(prompt_attributes, function (err, result) {
 				  } 
 				else{
 					print(`Copied file doesn't exists. please check manually`);
+				}
 			});
 		});
 	}
