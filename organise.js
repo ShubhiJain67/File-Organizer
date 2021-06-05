@@ -7,7 +7,7 @@ organiserSettings = [
 			basePath: 'Media',
 			extensions: ['jpeg', 'jpg', 'png'],
 		},
-	},
+	}, // C:\Shubhi\Media\Gifs\
 	{
 		name: 'Gifs',
 		settings: {
@@ -73,6 +73,22 @@ organiserSettings = [
 		},
 	},
 	{
+		name: 'CSVs',
+		settings: {
+			files: [],
+			basePath: 'Documents',
+			extensions: ['csv'],
+		},
+	},
+	{
+		name: 'Zips',
+		settings: {
+			files: [],
+			basePath: 'Documents',
+			extensions: ['zip', 'rar', '7zip'],
+		},
+	},
+	{
 		name: 'PowerPoint Presentations',
 		settings: {
 			files: [],
@@ -114,10 +130,10 @@ organiserSettings = [
 	},
 ];
 
-let prompt_attributes = [
+let promptAttributes = [
 	{
 		name: 'folderPath',
-		description: 'Enter the Folder Path',
+		description: 'Enter the Folder Path which needs to be Organized',
 		required: true,
 		hidden: false,
 	},
@@ -138,9 +154,9 @@ function organise(result){
 		setting.settings.files.forEach((file) => {
 			oldPath = result.folderPath + path.sep + file;
 			newPath = result.folderPath;
-			if (setting.settings.basePath != ""){
+			if (setting.settings.basePath != ""){ //  "Documents" "Files" "Folders"
 				setting.settings.basePath.split('\\').forEach((folder)=>{
-					newPath += path.sep + folder
+					newPath += path.sep + folder // C:\Documents\Files\Folders
 					if(!fs.existsSync(newPath)){
 						print(`Creating new folder : ${folder}`);
 						fs.mkdirSync(newPath)
@@ -169,7 +185,7 @@ function organise(result){
 
 function segregateAllFiles(files = []) {
 	files.forEach((file) => {
-		let fileArgs = file.split('.');
+		let fileArgs = file.split('.'); //Folder -> ["Folder"]  file.csv ["file", "csv"]
 		let yetToSegregate = true;
 		organiserSettings.forEach((os) => {
 			if (fileArgs.length > 1 && yetToSegregate) {
@@ -192,7 +208,7 @@ function getFiles(dirPath) {
 			segregateAllFiles(files);
 		}
 	} catch (err) {
-		printError('Error Occurred : ' + err);
+		printError(err);
 	}
 }
 
@@ -203,19 +219,16 @@ const path = require('path');
 const fs = require('fs');
 
 print('\n------------------------------Welcome to File Organizer----------------------------\n');
-print('Please enter the folder path you want to organize');
 
 prompt.start();
-prompt.get(prompt_attributes, function (err, result) {
+prompt.get(promptAttributes, function (err, result) {
 	if (err) {
 		printError(err);
 		return 1;
 	} else {
-		print('\n----------------------------- Operation Started -------------------------------\n');
 		getFiles(result.folderPath);
+		print('\n----------------------------- Operation Started -------------------------------\n');
 		organise(result);
 		print('\n------------------------------ Operation Completed -----------------------------\n');
 	}
 });
-
-//C:\Users\ShubhiJ\Desktop\Practice\Pep\Javascript\File-Organizer\org
